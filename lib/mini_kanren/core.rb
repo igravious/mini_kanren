@@ -203,14 +203,14 @@ module MiniKanren
     end
 
     def all(*goals)
-      return succeed if goals.length == 0
+      return success if goals.length == 0
       lambda { |s|
         goals.each { |goal| s = bind(s, goal) }
         s }
     end
 
     def conde(*goals)
-      return succeed if goals.length == 0
+      return success if goals.length == 0
       lambda { |s| lambda { mplus_all(goals, s) } }
     end
 
@@ -238,11 +238,11 @@ module MiniKanren
       lambda { |s| func.call(*args).call(s) }
     end
 
-    def succeed
+    def success
       lambda { |s| s }
     end
 
-    def fail
+    def failure
       lambda { |s| nil }
     end
 
