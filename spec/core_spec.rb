@@ -7,20 +7,20 @@ describe "Core" do
     MiniKanren.exec do
       q = fresh
       run(q,eq(true, q)).should == [true]
-      run(q, fail).should == []
+      run(q, failure).should == []
       run(q, eq(true, q)).should == [true]
-      run(q, all(fail, eq(true, q))).should == []
-      run(q, all(succeed, eq(true, q))).should == [true]
-      run(q, all(succeed, eq(:corn, q))).should == [:corn]
-      run(q, all(fail, eq(:corn, q))).should == []
-      run(q, all(succeed, eq(false, q))).should == [false]
+      run(q, all(failure, eq(true, q))).should == []
+      run(q, all(success, eq(true, q))).should == [true]
+      run(q, all(success, eq(:corn, q))).should == [:corn]
+      run(q, all(failure, eq(:corn, q))).should == []
+      run(q, all(success, eq(false, q))).should == [false]
 
       x = fresh
       run(q, eq(true,q))
       run(q, all(eq(true, x), eq(true, q))).should == [true]
       run(q, all(eq(x, true), eq(true, q))).should == [true]
-      run(q, succeed).should == ["_.0"]
-      run(q, succeed).should == ["_.0"]
+      run(q, success).should == ["_.0"]
+      run(q, success).should == ["_.0"]
 
       x, y = fresh(2)
       run(q, eq([x, y], q)).should == [["_.0", "_.1"]]
@@ -51,34 +51,34 @@ describe "Core" do
 
       run(q, eq(x == q, q)).should == [false]
 
-      run(q, conde(all(fail, succeed),
-      all(succeed, fail))).should == []
+      run(q, conde(all(failure, success),
+      all(success, failure))).should == []
 
-      run(q, conde(all(fail, fail),
-      all(succeed, succeed))).should == ["_.0"]
+      run(q, conde(all(failure, failure),
+      all(success, success))).should == ["_.0"]
 
-      run(q, conde(all(succeed, succeed),
-      all(fail, fail))).should == ["_.0"]
+      run(q, conde(all(success, success),
+      all(failure, failure))).should == ["_.0"]
 
-      run(q, conde(all(eq(:olive, q), succeed),
-      all(eq(:oil, q), succeed))).should == [:olive, :oil]
+      run(q, conde(all(eq(:olive, q), success),
+      all(eq(:oil, q), success))).should == [:olive, :oil]
 
-      run(1, q, conde(all(eq(:olive, q), succeed),
-      all(eq(:oil, q), succeed))).should == [:olive]
+      run(1, q, conde(all(eq(:olive, q), success),
+      all(eq(:oil, q), success))).should == [:olive]
 
-      run(q, conde(all(eq(:virgin, q), fail),
-      all(eq(:olive, q), succeed),
-      all(succeed, succeed),
-      all(eq(:oil, q), succeed))).should == [:olive, "_.0", :oil]
+      run(q, conde(all(eq(:virgin, q), failure),
+      all(eq(:olive, q), success),
+      all(success, success),
+      all(eq(:oil, q), success))).should == [:olive, "_.0", :oil]
 
-      run(q, conde(all(eq(:olive, q), succeed),
-      all(succeed, succeed),
-      all(eq(:oil, q), succeed))).should == [:olive, "_.0", :oil]
+      run(q, conde(all(eq(:olive, q), success),
+      all(success, success),
+      all(eq(:oil, q), success))).should == [:olive, "_.0", :oil]
 
-      run(2, q, conde(all(eq(:extra, q), succeed),
-      all(eq(:virgin, q), fail),
-      all(eq(:olive, q), succeed),
-      all(eq(:oil, q), succeed))).should == [:extra, :olive]
+      run(2, q, conde(all(eq(:extra, q), success),
+      all(eq(:virgin, q), failure),
+      all(eq(:olive, q), success),
+      all(eq(:oil, q), success))).should == [:extra, :olive]
 
       x = fresh
       y = fresh
@@ -101,15 +101,15 @@ describe "Core" do
 
       def teacupo(x)
         conde(
-        all(eq(:tea, x), succeed),
-        all(eq(:cup, x), succeed))
+        all(eq(:tea, x), success),
+        all(eq(:cup, x), success))
       end
 
       run(q, teacupo(q)).should == [:tea, :cup]
 
       run(q, all(
       conde(
-      all(teacupo(x), eq(true, y), succeed),
+      all(teacupo(x), eq(true, y), success),
       all(eq(false, x), eq(true, y))),
       eq([x, y], q))).should ==
       [[false, true], [:tea, true], [:cup, true]]
@@ -272,7 +272,7 @@ describe "Core" do
       def listo(l)
         d = fresh
         conde(
-        all(nullo(l), succeed),
+        all(nullo(l), success),
         all(pairo(l), cdro(l, d), defer(method(:listo), d)))
       end
 
